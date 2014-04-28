@@ -1,6 +1,7 @@
 """
 Implementation of the Nearest Neighbour Tracking Algorithm.
 Author: Travis Dick (travis.barry.dick@gmail.com)
+      : Ankush Roy (ankush1123roy@gmail.com)
 """
 import time
 import numpy as np
