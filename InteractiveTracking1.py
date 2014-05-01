@@ -53,18 +53,21 @@ class InteractiveTrackingApp:
 		self.filename = filename
 		self.height = None
 		self.width = None
+		#self.templateBuffer = [0]*20
+		
 		#if not os.path.exists(filename):
 		#	os.mkdir(filename)
 		self.fname = open(filename+'/'+tracker_name+'.txt','w')
 		self.fname.write('%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s\n'%('frame','ulx','uly','urx','ury','lrx','lry','llx','lly'))
 		cv2.namedWindow(self.name)
-		self.D = Detector(1000, 0.1)
-		self.D.train(4)
+		self.D = Detector(700, 0.2)
+		self.D.train(5)
 			#cv2.setMouseCallback(self.name, self.mouse_handler4)
 	#self.writer = cv2.VideoWriter('alpha.avi',cv.CV_FOURCC('D','I','V','3'),10,size)
 
 	def display(self, img):
 		annotated_img = img.copy()
+		original_img = img.copy()
 		if self.tracker.is_initialized():
 			corners = self.tracker.get_region()
 			img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -75,7 +78,7 @@ class InteractiveTrackingApp:
 			draw_region(annotated_img, corners, (0,255,0), 2)
 			#import pdb;pdb.set_trace()
 			self.fname.write('%-15s%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f\n'%('frame'+('%05d'%(self.times))+'.jpg',corners[0,0],corners[1,0],corners[0,1],corners[1,1],corners[0,2],corners[1,2],corners[0,3],corners[1,3]))
-#	'''	
+#	'''
 #	if self.m_start != None and self.m_end != None:
 #            ul = (min(self.m_start[0],self.m_end[0]), min(self.m_start[1],self.m_end[1]))
 #            lr = (max(self.m_start[0],self.m_end[0]), max(self.m_start[1],self.m_end[1]))           #             corners = np.array([ ul, [lr[0],ul[1]], lr, [ul[0],lr[1]]]).T
@@ -87,6 +90,12 @@ class InteractiveTrackingApp:
 		#cv2.imshow(self.name, annotated_img)
 		#import pdb;pdb.set_trace()
 		cv2.imwrite('../{0:04d}.jpg'.format(self.times),annotated_img)
+		temp = original_img[corners[1][1]:corners[1][2], corners[0][0]:corners[0][1]]
+		#import pdb;pdb.set_trace()
+		#self.templateBuffer.append(temp)
+		#self.templateBuffer.pop(0)
+		
+		
 		cv.WaitKey(500)
 	#if self.times == 1: cv.WaitKey(6000)
 	#self.writer.write(annotated_img)
@@ -129,8 +138,8 @@ class InteractiveTrackingApp:
 	def on_frame(self, img, numtimes,initparamtemp):
 		print(numtimes)
 		self.times = numtimes
-		if numtimes == 1:
-			#cv.WaitKey(6000)	    
+		if numtimes == 280:
+			#cv.WaitKey(6000)	
 			#self.initparamtemp = [[336,165],[362,165],[362,226],[336,226]]
 			self.initparamtemp = initparamtemp
 			self.initparam = np.array(self.initparamtemp).T
@@ -160,13 +169,19 @@ class InteractiveTrackingApp:
 			#X, Y =  self.D.Detect(img)
 			#self.initparamtemp = [[int(X) - self.width, int(Y) - self.height],[int(X) + self.width, int(Y) - self.height],[int(X) + self.width, self.height + int(Y)],[int(X) - self.width, int(Y) + self.height]]
 			#import pdb;pdb.set_trace()
+			#cv2.imwrite('/home/ankush/OriginalNN/NNTracker/src/NNTracker/src/{0:04d}.jpg'.format(self.times), self.templateBuffer[-1])
+			
 			self.initparamtemp = self.D.Detect(img)
+			#print self.initparamtemp
+			#if self.initparamtemp != False:
 			# Change this initialisation point
 			self.initparam = np.array(self.initparamtemp).T
 			self.gray_img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 			self.gray_img = self.gray_img.astype(np.float64)
 			self.tracker.initialize(self.gray_img,self.initparam)
-			
+			#else:
+			#	print 'Low Keypoints'
+				
 		if self.img != None: self.display(self.img)
 		key = cv.WaitKey(7)
 		if key == ord(' '): self.paused = not self.paused

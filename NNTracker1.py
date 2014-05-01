@@ -23,7 +23,7 @@ import math
 
 class NNTracker(TrackerBase):
 
-	def __init__(self, n_samples, n_iterations=10, res=(20,20), warp_generator=lambda:random_homography(0.01, 0.01), use_scv=True):
+	def __init__(self, n_samples, n_iterations=10, res=(40,40), warp_generator=lambda:random_homography(0.02, 0.02), use_scv=True):
 		""" An implemetation of the Nearest Neighbour Tracker. 
 	
 				Parameters:
@@ -97,7 +97,8 @@ class NNTracker(TrackerBase):
 		H =  self.warp_index.best_match(sampled_img)
 		#sampled_img = np.reshape(sampled_img, (40,40))#, order = 'F')
 		SSD = (sum([abs(sampled_img[k] - self.template[k]) for k in range(self.template.shape[0])])/self.template.shape[0])
-		if SSD > 20:
+		#import pdb;pdb.set_trace()
+		if SSD > 25:
 			W = False
 		#cv2.imwrite('../{0:04d}.jpg'.format(random.randint(1,1200)),sampled_img) # These are the sampled Images Can use them for training
 		#out = cv2.warpPerspective(sampled_img, H, (640,480)) 

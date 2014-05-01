@@ -2,7 +2,9 @@ import cv2
 import numpy as np
 import time
 import gc
+import cv
 from matplotlib import pyplot as plt 
+from scipy.cluster.vq import kmeans,vq
 gc.disable()
 
 
@@ -34,29 +36,33 @@ class Detector():
 	def train(self, no):
 # Load the images
 		#import pdb;pdb.set_trace()
-		imgg = cv2.imread('../Template/' + '0001' + '.jpg')
+		imgg = cv2.imread('../Template1/' + '0001' + '.jpg')
 		self.height = imgg.shape[0] 
 		self.width = imgg.shape[1]  
 		for i in range(1,no+1):
 			seq = '%04d'%i
-			imgg = cv2.imread('../Template/' + str(seq) + '.jpg')
+			imgg = cv2.imread('../Template1/' + str(seq) + '.jpg')
 			#imgg =cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 			#import pdb;pdb.set_trace()
 			kp, descriptors = self.Feature_Extractor.getFeatures(imgg)
-			self.samples = np.vstack((self.samples,descriptors))
-			self.keypoints = self.keypoints + kp
+			if descriptors != None:
+				self.samples = np.vstack((self.samples,descriptors))
+				self.keypoints = self.keypoints + kp
 		self.samples = self.samples[1:]
 		responses = np.arange(self.samples.shape[0],dtype = np.float32)
 		self.knn.train(self.samples,responses)
 
 # Now loading a template image and searching for similar keypoints
 	def Detect(self, img):
-		#import pdb;pdb.set_trace()
+		img1 = img.copy()
 		keys,desc = self.Feature_Extractor.getFeatures(img)
 		retval, results, neigh_resp, dists = self.knn.find_nearest(desc,1)
 		X, Y = [], []
 		goodSrc = []
 		goodDest = []
+		color = (0,0,255)
+		centers = np.array([0 for i in range(2)], dtype = np.float32)
+		center = []
 		for h in range(desc.shape[0]):
 			des = desc[h].reshape((1,128))
 			retval, results, neigh_resp, dists = self.knn.find_nearest(des,1)
@@ -65,22 +71,45 @@ class Detector():
 			
 			if dist < self.dist_threshold:
 		#Draw matched key points on template image
-				X.append(keys[h].pt[0]);Y.append(keys[h].pt[1])
+				center.append((int(keys[h].pt[0]),int(keys[h].pt[1])))
+				#import pdb;pdb.set_trace()
+				centers  = np.vstack((centers, [int(keys[h].pt[0]),int(keys[h].pt[1])]))
+				
+				#cv2.circle(img,center,8,color,-1)
 				goodSrc.append(keys[h].pt)
 				goodDest.append(self.keypoints[int(neigh_resp)].pt)
-		#import pdb;pdb.set_trace()
-		src_pts = np.float32(goodSrc).reshape(-1,1,2)
-		dst_pts = np.float32(goodDest).reshape(-1,1,2)
-		M, mask = cv2.findHomography(dst_pts, src_pts, cv2.RANSAC,2.0)
-		matchesMask = mask.ravel().tolist()
-		#import pdb;pdb.set_trace()
+		centers = centers[1:]
+		centroids,_ = kmeans(centers,2)
+		idx,_ = vq(centers,centroids)
+		goodSrc1 = []
+		goodDest1 = []
+		VAL = 0 
+		if sum(idx) > len(idx)/2:
+			VAL = 1
+		for JJ in range(len(idx)):
+			if idx[JJ] == VAL:
+				goodSrc1.append(goodSrc[JJ])
+				goodDest1.append(goodDest[JJ])
+				cv2.circle(img1,center[JJ],8,color,-1)
 		
-		pts = np.float32([ [0,0],[0,self.height-1],[self.width-1,self.height-1],[self.width-1,0] ]).reshape(-1,1,2)
-		dst = cv2.perspectiveTransform(pts,M)
-		
-		cv2.polylines(img,[np.int32(dst)],True,(0,255,255))
+		#import pdb;pdb.set_trace()
 		cv2.imwrite('{0:04d}.jpg'.format(self.Number),img)
-		self.Number += 1
+		#import pdb;pdb.set_trace()
+		if len(goodSrc1) >= 8:
+			src_pts = np.float32(goodSrc1).reshape(-1,1,2)
+			dst_pts = np.float32(goodDest1).reshape(-1,1,2)
+			#M, mask = cv2.findHomography(dst_pts, src_pts, cv2.RANSAC,0.2)
+			M, mask = cv2.findHomography(dst_pts, src_pts,method=cv.CV_LMEDS)
+			matchesMask = mask.ravel().tolist()
+		#import pdb;pdb.set_trace()
+		
+			pts = np.float32([ [0,0],[0,self.height-1],[self.width-1,self.height-1],[self.width-1,0] ]).reshape(-1,1,2)
+			dst = cv2.perspectiveTransform(pts,M)
+		
+			cv2.polylines(img1,[np.int32(dst)],True,(0,255,255))
+			
+			cv2.imwrite('{0:04d}.jpg'.format(self.Number),img1)
+			self.Number += 1
 		
 				
 			#x, y = keys[h].pt
@@ -88,5 +117,20 @@ class Detector():
 		# Calculate Homography here
 		#center = (int(sum(X)/len(X)),int(sum(Y)/len(Y)))
 		#return center
-		CO_ORDS = [[dst[0][0][0], dst[0][0][1]],[dst[3][0][0], dst[3][0][1]],[dst[2][0][0], dst[2][0][1]],[dst[1][0][0], dst[1][0][1]]]
-		return CO_ORDS
+			CO_ORDS = [[dst[0][0][0], dst[0][0][1]],[dst[3][0][0], dst[3][0][1]],[dst[2][0][0], dst[2][0][1]],[dst[1][0][0], dst[1][0][1]]]
+			#import pdb;pdb.set_trace()\
+			# Retraining this updates the appearance model
+			if CO_ORDS[0][1] < CO_ORDS[2][1] and CO_ORDS[0][1] >= 0 and CO_ORDS[2][1] >=0:
+				if CO_ORDS[0][0] < CO_ORDS[1][0] and CO_ORDS[0][0] >= 0 and CO_ORDS[1][0] >= 0:
+					temp = img[CO_ORDS[0][1]:CO_ORDS[2][1], CO_ORDS[0][0]:CO_ORDS[1][0]]
+					kp, descriptors = self.Feature_Extractor.getFeatures(temp)
+					self.samples = np.vstack((self.samples,descriptors))
+					self.keypoints = self.keypoints + kp
+					responses = np.arange(self.samples.shape[0],dtype = np.float32)
+					print 'Re Training'
+					self.knn.train(self.samples,responses)
+					return CO_ORDS
+				else:return False
+			else:return False
+		else:
+			return False

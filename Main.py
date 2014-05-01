@@ -26,9 +26,9 @@ class StandaloneTrackingApp(InteractiveTrackingApp):
 
 	def run(self):
 
-		i = 1
+		i = 280
 		while i <= self.nframe:
-			img = cv2.imread(self.path+'%05d.jpg'%i)
+			img = cv2.imread(self.path+'%04d.jpg'%i)
 			if img == None: 
 				print('error loading image')
 				break
@@ -42,12 +42,12 @@ if __name__ == '__main__':
 	fine_tracker = BakerMatthewsICTracker(40, res = (40,40), use_scv = True)
 	tracker = CascadeTracker([coarse_tracker, fine_tracker])
 	filename = '/home/ankush/OriginalNN/NNTracker/src/NNTracker/'
-	path = '/home/ankush/GNNTracker/Videos/nl_highlighting/frame'
+	path = '/home/ankush/OriginalNN/NNTracker/src/Data/Liquor/img/'
 	#initparam = [[372, 435],[421 ,433],[425, 488], [373, 490]]
-	initparam = [[309.0, 517.0], [524.0, 504.0], [539.0, 554.0], [306.0, 568.0]] # Book III
+	initparam = [[256.0, 152.0], [329.0, 152.0], [329.0, 362.0], [256.0, 362.0]] # Book III
 	#initparam = [[581,104],[160,92],[138,414],[602,423]]                    # Metaio 4_1
-	tracker_name = 'HighlightRansac'
-	nframe = 900
+	tracker_name = 'DeerCVPR'
+	nframe = 1500
 	app = StandaloneTrackingApp(None, coarse_tracker,filename,tracker_name,path,initparam,nframe)
 	app.run()
 	app.cleanup()
