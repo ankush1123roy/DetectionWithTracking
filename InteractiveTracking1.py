@@ -10,7 +10,7 @@ from CascadeTracker import *
 from Homography import *
 from ImageUtils import *
 from NNTracker1 import *
-from SurfDetectionKNN import *
+from SiftDetection import *
 
 class InteractiveTrackingApp:
 	def __init__(self, tracker, filename=None, tracker_name=None,name="vis"):
@@ -53,6 +53,7 @@ class InteractiveTrackingApp:
 		self.filename = filename
 		self.height = None
 		self.width = None
+		self.visible = True
 		#self.templateBuffer = [0]*20
 		
 		#if not os.path.exists(filename):
@@ -60,8 +61,8 @@ class InteractiveTrackingApp:
 		self.fname = open(filename+'/'+tracker_name+'.txt','w')
 		self.fname.write('%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s\n'%('frame','ulx','uly','urx','ury','lrx','lry','llx','lly'))
 		cv2.namedWindow(self.name)
-		self.D = Detector(700, 0.2)
-		self.D.train(5)
+		self.D = Detector( 0.1, 10)
+		self.D.train()
 			#cv2.setMouseCallback(self.name, self.mouse_handler4)
 	#self.writer = cv2.VideoWriter('alpha.avi',cv.CV_FOURCC('D','I','V','3'),10,size)
 
@@ -155,8 +156,8 @@ class InteractiveTrackingApp:
 			'''
 		corners = self.tracker.get_region()
 		#import pdb;pdb.set_trace()
-		self.width = (corners[0][1] - corners[0][0]) / 2
-		self.height = (corners[1][2] - corners[1][1]) / 2 
+		#self.width = (corners[0][1] - corners[0][0]) / 2
+		#self.height = (corners[1][2] - corners[1][1]) / 2 
 		#print self.height, self.width
 		if not self.paused:
 			self.img = img
@@ -168,17 +169,21 @@ class InteractiveTrackingApp:
 			#import pdb;pdb.set_trace()
 			#X, Y =  self.D.Detect(img)
 			#self.initparamtemp = [[int(X) - self.width, int(Y) - self.height],[int(X) + self.width, int(Y) - self.height],[int(X) + self.width, self.height + int(Y)],[int(X) - self.width, int(Y) + self.height]]
-			#import pdb;pdb.set_trace()
+			
 			#cv2.imwrite('/home/ankush/OriginalNN/NNTracker/src/NNTracker/src/{0:04d}.jpg'.format(self.times), self.templateBuffer[-1])
 			
 			self.initparamtemp = self.D.Detect(img)
+			#import pdb;pdb.set_trace()
 			#print self.initparamtemp
 			#if self.initparamtemp != False:
 			# Change this initialisation point
-			self.initparam = np.array(self.initparamtemp).T
-			self.gray_img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-			self.gray_img = self.gray_img.astype(np.float64)
-			self.tracker.initialize(self.gray_img,self.initparam)
+			if self.initparamtemp == False:
+				self.visible = False
+			else:
+				self.initparam = np.array(self.initparamtemp).T
+				self.gray_img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+				self.gray_img = self.gray_img.astype(np.float64)
+				self.tracker.initialize(self.gray_img,self.initparam)
 			#else:
 			#	print 'Low Keypoints'
 				
