@@ -4,8 +4,8 @@ import cv2
 
 MIN_MATCH_COUNT = 10
 
-img1 = cv2.imread('../Template1/' + '0002' + '.jpg',0) # queryImage
-img2 = cv2.imread('/home/ankush/OriginalNN/NNTracker/src/Data/Liquor/img/0356.jpg',0) # trainImage
+img1 = cv2.imread('../Template1/' + '0001' + '.jpg',0) # queryImage
+img2 = cv2.imread('/home/ankush/OriginalNN/NNTracker/src/Data/nl_cereal_s5/frame00167.jpg',0) # trainImage
 
 sift = cv2.SIFT()
 

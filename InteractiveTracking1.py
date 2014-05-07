@@ -61,7 +61,7 @@ class InteractiveTrackingApp:
 		self.fname = open(filename+'/'+tracker_name+'.txt','w')
 		self.fname.write('%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s\n'%('frame','ulx','uly','urx','ury','lrx','lry','llx','lly'))
 		cv2.namedWindow(self.name)
-		self.D = Detector( 0.1, 10)
+		self.D = Detector( 0.9, 10)
 		self.D.train()
 			#cv2.setMouseCallback(self.name, self.mouse_handler4)
 	#self.writer = cv2.VideoWriter('alpha.avi',cv.CV_FOURCC('D','I','V','3'),10,size)
@@ -139,7 +139,7 @@ class InteractiveTrackingApp:
 	def on_frame(self, img, numtimes,initparamtemp):
 		print(numtimes)
 		self.times = numtimes
-		if numtimes == 280:
+		if numtimes == 1:
 			#cv.WaitKey(6000)	
 			#self.initparamtemp = [[336,165],[362,165],[362,226],[336,226]]
 			self.initparamtemp = initparamtemp
@@ -154,17 +154,23 @@ class InteractiveTrackingApp:
 			corners = 
 			self.fname.write('%-15s%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f\n'%('frame'+('%05d'%(self.times))+'.jpg',corners[0,0],corners[1,0],corners[0,1],corners[1,1],corners[0,2],corners[1,2],corners[0,3],corners[1,3]))
 			'''
-		corners = self.tracker.get_region()
-		#import pdb;pdb.set_trace()
+		if self.visible == True:
+			corners = self.tracker.get_region()
+		else:
+			corners = self.D.Detect(img)
+			if corners == False:
+				pass
+			else:
+				self.visible = True
 		#self.width = (corners[0][1] - corners[0][0]) / 2
 		#self.height = (corners[1][2] - corners[1][1]) / 2 
 		#print self.height, self.width
 		if not self.paused:
 			self.img = img
 			self.gray_img = cv2.GaussianBlur(to_grayscale(img), (5,5), 3)
-			#self.gray_img = to_grayscale(img)
-		val1, val2 = self.tracker.update(self.gray_img)
-		if val2 == False:
+			self.gray_img = to_grayscale(img)
+			val1, val2 = self.tracker.update(self.gray_img)
+			if val2 == False:
 			
 			#import pdb;pdb.set_trace()
 			#X, Y =  self.D.Detect(img)
@@ -172,18 +178,18 @@ class InteractiveTrackingApp:
 			
 			#cv2.imwrite('/home/ankush/OriginalNN/NNTracker/src/NNTracker/src/{0:04d}.jpg'.format(self.times), self.templateBuffer[-1])
 			
-			self.initparamtemp = self.D.Detect(img)
+				self.initparamtemp = self.D.Detect(img)
 			#import pdb;pdb.set_trace()
 			#print self.initparamtemp
 			#if self.initparamtemp != False:
 			# Change this initialisation point
-			if self.initparamtemp == False:
-				self.visible = False
-			else:
-				self.initparam = np.array(self.initparamtemp).T
-				self.gray_img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-				self.gray_img = self.gray_img.astype(np.float64)
-				self.tracker.initialize(self.gray_img,self.initparam)
+				if self.initparamtemp == False:
+					self.visible = False
+				else:
+					self.initparam = np.array(self.initparamtemp).T
+					self.gray_img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+					self.gray_img = self.gray_img.astype(np.float64)
+					self.tracker.initialize(self.gray_img,self.initparam)
 			#else:
 			#	print 'Low Keypoints'
 				

@@ -26,7 +26,7 @@ class Detector():
 		self.Number = 0
 	
 	def train(self):
-		img1 = cv2.imread('../Template1/' + '0002' + '.jpg',0) # queryImage
+		img1 = cv2.imread('../Template1/' + '0001' + '.jpg',0) # queryImage
 #img2 = cv2.imread('/home/ankush/OriginalNN/NNTracker/src/Data/Liquor/img/1467.jpg',0) # trainImage
 		
 		self.height, self.width = img1.shape 
@@ -34,7 +34,7 @@ class Detector():
 		#self.keypoints = kp2
 		#self.samples =  des2
 		
-		for i in range(5,6):
+		for i in range(1,2):
 			seq = '%04d'%i
 			print 'Training on', str(seq), '.jpg'
 			img1 = cv2.imread('../Template1/' + str(seq) + '.jpg')
@@ -50,12 +50,13 @@ class Detector():
 
 
 	def Detect(self, img):
+		print 'Detecting The Object'
 		img1 = img.copy()
 		#import pdb;pdb.set_trace()
 		kp1, des1 = self.Feature_Extractor.getFeatures(img)
 		FLANN_INDEX_KDTREE = 0
 		index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 10)
-		search_params = dict(checks = 50)
+		search_params = dict(checks = 20)
 		flann = cv2.FlannBasedMatcher(index_params, search_params)
 		matches = flann.knnMatch(des1, self.samples, k=2)
 		good = []
@@ -89,9 +90,3 @@ class Detector():
 			print 'Not enough key points'
 			matchesMask = None
 			return False
-'''
-M = 
-array([[  9.97853213e-01,   2.45424613e-02,   2.49750175e+02],
-       [ -5.70531669e-02,   1.06755581e+00,   1.58148134e+02],
-       [ -1.79983110e-04,   8.76030140e-05,   1.00000000e+00]])
-'''
