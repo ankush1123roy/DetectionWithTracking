@@ -1,6 +1,10 @@
 import numpy as np
 from visual import *
-
+'''
+Author: Ankush Roy
+			Ryan Kiros 
+			Matthew Low
+'''
 class features:
 	
 	def __init__(self,
