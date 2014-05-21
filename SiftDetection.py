@@ -39,7 +39,7 @@ class Detector():
 			print 'Training on', str(seq), '.jpg'
 			img1 = cv2.imread('../Template1/' + str(seq) + '.jpg')
 			kp2, des2 = self.Feature_Extractor.getFeatures(img1)
-			#import pdb;pdb.set_trace()
+			import pdb;pdb.set_trace()
 			if len(des2) > 0:
 				self.samples = np.vstack((self.samples,des2))
 				self.keypoints = self.keypoints + kp2

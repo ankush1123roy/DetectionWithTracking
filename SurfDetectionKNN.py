@@ -44,7 +44,7 @@ class Detector():
 	def train(self, no):
 # Load the images
 		#import pdb;pdb.set_trace()
-		imgg = cv2.imread('../Template1/' + '0001' + '.jpg')
+		imgg = cv2.imread('../Template1/0001.jpg')
 		self.height = imgg.shape[0] 
 		self.width = imgg.shape[1]  
 		for i in range(1,no+1):

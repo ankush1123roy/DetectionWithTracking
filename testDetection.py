@@ -4,18 +4,22 @@ import cv2
 
 MIN_MATCH_COUNT = 10
 
-img1 = cv2.imread('../Template1/' + '0001' + '.jpg',0) # queryImage
-img2 = cv2.imread('/home/ankush/OriginalNN/NNTracker/src/Data/nl_cereal_s5/frame00167.jpg',0) # trainImage
+
+
+img1 = cv2.imread('../Template1/' + '0001' + '.jpg',0) # trainImage
+img2 = cv2.imread('/home/ankush/OriginalNN/NNTracker/src/Data/Liquor/img/0001.jpg',0) # queryImage
 
 sift = cv2.SIFT()
 
 kp1, des1 = sift.detectAndCompute(img1,None)
 kp2, des2 = sift.detectAndCompute(img2,None)
 
+import pdb;pdb.set_trace()
 FLANN_INDEX_KDTREE = 0
 index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 25)
 search_params = dict(checks = 10)
 flann = cv2.FlannBasedMatcher(index_params, search_params)
+
 matches = flann.knnMatch(des1,des2,k=2)
 
 good = []
@@ -26,6 +30,7 @@ for m,n in matches:
 
 if len(good) > MIN_MATCH_COUNT:
 	src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
+	import pdb;pdb.set_trace()
 	dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
 	
 	M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
