@@ -96,18 +96,9 @@ class NNTracker(TrackerBase):
 		self.proposal = self.proposal * update
 		self.proposal /= self.proposal[2,2]
 		H =  self.warp_index.best_match(sampled_img)
-		#sampled_img = np.reshape(sampled_img, (40,40))#, order = 'F')
 		SSD = (sum([abs(sampled_img[k] - self.template[k]) for k in range(self.template.shape[0])])/self.template.shape[0])
-		#import pdb;pdb.set_trace()
 		if SSD > 20:
 			W = False
-		#cv2.imwrite('../{0:04d}.jpg'.format(random.randint(1,1200)),sampled_img) # These are the sampled Images Can use them for training
-		#out = cv2.warpPerspective(sampled_img, H, (640,480)) 
-		#cv2.imwrite('../{0:04d}.jpg'.format(random.randint(1,1200)),np.reshape(sampled_img,(40,40))) 
-		#out = np.array(out, dtype = 'int')
-		
-		#print self.proposal
-#		cv2.imwrite('../{0:04d}.jpg'.format(random.randint(1,200)),out)
 		if self.use_scv: self.intensity_map = scv_intensity_map(sample_region(img, self.pts, self.get_warp()), self.template)
 		return self.proposal, W
 
@@ -141,23 +132,6 @@ class _WarpIndex:
 			desc = self.list2array(self.pixel2sift(self.images))
 			self.flann = pyflann.FLANN()
 		print "Done!"
-
-    # --- For sift --- #
-#	def pixel2sift(self,images):
-#		detector = cv2.FeatureDetector_create("SIFT")
-#	detector.setDouble('edgeThreshold',30)
-#        descriptor = cv2.DescriptorExtractor_create("SIFT")
-        #sift = cv2.SIFT(edgeThreshold = 20)
-	# -- store descriptors in list --#
-#        desc = []
-#        for i in range(images.shape[1]):
-#            patch = (images[:,i].reshape(self.resx,self.resy)).astype(np.uint8)
-            #pdb.set_trace()
-#	    skp = detector.detect(patch)
-#            skp, sd = descriptor.compute(patch, skp)
-#            desc.append(sd)
-#            self.indx.append(len(skp))
-#	return desc
 
     # --- For sift ---#
 	def list2array(self,desc):

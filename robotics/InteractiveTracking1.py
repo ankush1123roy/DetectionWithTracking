@@ -72,28 +72,15 @@ class InteractiveTrackingApp:
 		if self.tracker.is_initialized():
 			corners = self.tracker.get_region()
 			img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-			#print img.shape
-			#if Flag == 1:
-			#	draw_region(annotated_img, corners, (0,255,255), 2)
-			#else:
 			draw_region(annotated_img, corners, (0,255,0), 2)
 			#import pdb;pdb.set_trace()
 			self.fname.write('%-15s%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f\n'%('frame'+('%05d'%(self.times))+'.jpg',corners[0,0],corners[1,0],corners[0,1],corners[1,1],corners[0,2],corners[1,2],corners[0,3],corners[1,3]))
-#	'''
-#	if self.m_start != None and self.m_end != None:
-#            ul = (min(self.m_start[0],self.m_end[0]), min(self.m_start[1],self.m_end[1]))
-#            lr = (max(self.m_start[0],self.m_end[0]), max(self.m_start[1],self.m_end[1]))           #             corners = np.array([ ul, [lr[0],ul[1]], lr, [ul[0],lr[1]]]).T
-#	'''
 		elif len(self.initparamtemp) == 4:
 			corners = self.initparamtemp
 			draw_region(annotated_img, corners, (255,0,0), 1)
 			self.fname.write('%-15s%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f\n'%('frame'+('%05d'%(self.times))+'.jpg',corners[0,0],corners[1,0],corners[0,1],corners[1,1],corners[0,2],corners[1,2],corners[0,3],corners[1,3]))
-		#cv2.imshow(self.name, annotated_img)
 		cv2.imwrite('../{0:04d}.jpg'.format(self.times),annotated_img)
 		temp = original_img[corners[1][1]:corners[1][2], corners[0][0]:corners[0][1]]
-		#self.templateBuffer.append(temp)
-		#self.templateBuffer.pop(0)
-		
 		
 		cv.WaitKey(500)
 	#if self.times == 1: cv.WaitKey(6000)
