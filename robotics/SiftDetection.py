@@ -26,28 +26,18 @@ class Detector():
 		self.Number = 0
 	
 	def train(self):
-		import pdb;pdb.set_trace()
-
 		img1 = cv2.imread('../../Template1/' + '0001' + '.jpg',0) # queryImage
-#img2 = cv2.imread('/home/ankush/OriginalNN/NNTracker/src/Data/Liquor/img/1467.jpg',0) # trainImage
 		
 		self.height, self.width = img1.shape 
-		#import pdb; pdb.set_trace()
-		#self.keypoints = kp2
-		#self.samples =  des2
-		
 		for i in range(1,2):
 			seq = '%04d'%i
 			print 'Training on', str(seq), '.jpg'
 			img1 = cv2.imread('../../Template1/' + str(seq) + '.jpg')
 			kp2, des2 = self.Feature_Extractor.getFeatures(img1)
-			import pdb;pdb.set_trace()
 			if len(des2) > 0:
 				self.samples = np.vstack((self.samples,des2))
 				self.keypoints = self.keypoints + kp2
-		#import pdb;pdb.set_trace()
 		self.samples = self.samples[1:]
-		#self.keypoints = self.keypoints[1:]
 
 
 
@@ -74,11 +64,9 @@ class Detector():
 			matchesMask = mask.ravel().tolist()
 
 			pts = np.float32([ [0,0],[0,self.height-1],[self.width-1,self.height-1],[self.width-1,0] ]).reshape(-1,1,2)
-			#import pdb ;pdb.set_trace()
 			dst = cv2.perspectiveTransform(pts,M)
 			cv2.polylines(img1,[np.int32(dst)],True,(0,255,255))
 			cv2.imwrite('{0:04d}.jpg'.format(self.Number), img1)
-			#cv2.imwrite('hjk.jpg',img1)
 			self.Number = self.Number + 1
 			CO_ORDS = [[dst[0][0][0], dst[0][0][1]],[dst[3][0][0], dst[3][0][1]],[dst[2][0][0], dst[2][0][1]],[dst[1][0][0], dst[1][0][1]]]
 			'''

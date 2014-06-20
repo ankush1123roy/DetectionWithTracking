@@ -133,18 +133,6 @@ class _WarpIndex:
 			self.flann = pyflann.FLANN()
 		print "Done!"
 
-    # --- For sift ---#
-	def list2array(self,desc):
-		nums = sum(self.indx)
-		descs = np.empty((128,nums),dtype=np.float64)
-		counts = 0
-		for item in desc:
-			if item == None:
-				continue
-				for j in range(item.shape[0]):
-					descs[:,counts] = item[j,:].T
-					counts += 1
-		return descs.astype(np.float32)
 
 
 	def best_match(self, img):

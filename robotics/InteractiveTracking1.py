@@ -54,10 +54,6 @@ class InteractiveTrackingApp:
 		self.height = None
 		self.width = None
 		self.visible = True
-		#self.templateBuffer = [0]*20
-		
-		#if not os.path.exists(filename):
-		#	os.mkdir(filename)
 		self.fname = open(filename+'/'+tracker_name+'.txt','w')
 		self.fname.write('%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s\n'%('frame','ulx','uly','urx','ury','lrx','lry','llx','lly'))
 		cv2.namedWindow(self.name)
@@ -73,20 +69,16 @@ class InteractiveTrackingApp:
 			corners = self.tracker.get_region()
 			img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 			draw_region(annotated_img, corners, (0,255,0), 2)
-			#import pdb;pdb.set_trace()
 			self.fname.write('%-15s%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f\n'%('frame'+('%05d'%(self.times))+'.jpg',corners[0,0],corners[1,0],corners[0,1],corners[1,1],corners[0,2],corners[1,2],corners[0,3],corners[1,3]))
 		elif len(self.initparamtemp) == 4:
 			corners = self.initparamtemp
 			draw_region(annotated_img, corners, (255,0,0), 1)
 			self.fname.write('%-15s%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f\n'%('frame'+('%05d'%(self.times))+'.jpg',corners[0,0],corners[1,0],corners[0,1],corners[1,1],corners[0,2],corners[1,2],corners[0,3],corners[1,3]))
-		cv2.imwrite('../{0:04d}.jpg'.format(self.times),annotated_img)
-		temp = original_img[corners[1][1]:corners[1][2], corners[0][0]:corners[0][1]]
 		
+		#cv2.imwrite('../{0:04d}.jpg'.format(self.times),annotated_img) # Uncomment to save the images
+		temp = original_img[corners[1][1]:corners[1][2], corners[0][0]:corners[0][1]]
+		cv2.imshow(self.name, annotated_img) # Comment to stop display
 		cv.WaitKey(500)
-	#if self.times == 1: cv.WaitKey(6000)
-	#self.writer.write(annotated_img)
-		#cv.SaveImage( self.filename+'/'+'%04d'%self.times+'.jpg',cv.fromarray(annotated_img))
-
 	
 	def mouse_handler(self, evt,x,y,arg,extra):
 		if self.gray_img == None: return 
@@ -125,8 +117,6 @@ class InteractiveTrackingApp:
 		print(numtimes)
 		self.times = numtimes
 		if numtimes == 1:
-			#cv.WaitKey(6000)	
-			#self.initparamtemp = [[336,165],[362,165],[362,226],[336,226]]
 			corners = self.D.Detect(img)
 			self.initparamtemp = corners
 			self.initparam = np.array(self.initparamtemp).T
@@ -135,11 +125,6 @@ class InteractiveTrackingApp:
 			self.tracker.initialize(self.gray_img,self.initparam)
 			self.paused = False
 			self.inited = True
-			'''
-			if len(self.initparamtemp) == 4:	
-			corners = 
-			self.fname.write('%-15s%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f\n'%('frame'+('%05d'%(self.times))+'.jpg',corners[0,0],corners[1,0],corners[0,1],corners[1,1],corners[0,2],corners[1,2],corners[0,3],corners[1,3]))
-			'''
 		if self.visible == True:
 			corners = self.tracker.get_region()
 		else:
@@ -148,27 +133,13 @@ class InteractiveTrackingApp:
 				pass
 			else:
 				self.visible = True
-		#self.width = (corners[0][1] - corners[0][0]) / 2
-		#self.height = (corners[1][2] - corners[1][1]) / 2 
-		#print self.height, self.width
 		if not self.paused:
 			self.img = img
 			self.gray_img = cv2.GaussianBlur(to_grayscale(img), (5,5), 3)
 			self.gray_img = to_grayscale(img)
 			val1, val2 = self.tracker.update(self.gray_img)
 			if val2 == False:
-			
-			#import pdb;pdb.set_trace()
-			#X, Y =  self.D.Detect(img)
-			#self.initparamtemp = [[int(X) - self.width, int(Y) - self.height],[int(X) + self.width, int(Y) - self.height],[int(X) + self.width, self.height + int(Y)],[int(X) - self.width, int(Y) + self.height]]
-			
-			#cv2.imwrite('/home/ankush/OriginalNN/NNTracker/src/NNTracker/src/{0:04d}.jpg'.format(self.times), self.templateBuffer[-1])
-			
 				self.initparamtemp = self.D.Detect(img)
-			#import pdb;pdb.set_trace()
-			#print self.initparamtemp
-			#if self.initparamtemp != False:
-			# Change this initialisation point
 				if self.initparamtemp == False:
 					self.visible = False
 				else:
