@@ -15,6 +15,7 @@ from NNTracker1 import *
 from ParallelTracker import *
 from SiftDetection import *
 import cv2
+import cv
 class StandaloneTrackingApp(InteractiveTrackingApp):
 	""" A demo program that uses OpenCV to grab frames. """
 
@@ -26,11 +27,11 @@ class StandaloneTrackingApp(InteractiveTrackingApp):
 	def run(self):
 
 		i = 1
-		#capture = cv2.VideoCapture('VID_20140619_022236.mp4')
-		camera =  cv2.VideoCapture(0);
+		capture = cv2.VideoCapture('robot1.avi')
+		#camera =  cv2.VideoCapture(0)
 		while i <= self.nframe:
-			#flag, frame = capture.read()
-			f, frame = camera.read()
+			flag, frame = capture.read()
+			#f, frame = camera.read()
 			if frame == None: 
 				print('error loading image')
 				break
@@ -39,7 +40,7 @@ class StandaloneTrackingApp(InteractiveTrackingApp):
 		self.cleanup()
 
 if __name__ == '__main__':
-	coarse_tracker = NNTracker(10000, 2, res=(40,40), use_scv=True)
+	coarse_tracker = NNTracker(20000, 2, res=(40,40), use_scv=True)
 	#fine_tracker = ESMTracker(5, res=(40,40), use_scv=True)
 	fine_tracker = BakerMatthewsICTracker(40, res = (40,40), use_scv = True)
 	tracker = CascadeTracker([coarse_tracker, fine_tracker])

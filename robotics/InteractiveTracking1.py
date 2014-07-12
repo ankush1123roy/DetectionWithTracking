@@ -57,7 +57,7 @@ class InteractiveTrackingApp:
 		self.fname = open(filename+'/'+tracker_name+'.txt','w')
 		self.fname.write('%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s\n'%('frame','ulx','uly','urx','ury','lrx','lry','llx','lly'))
 		cv2.namedWindow(self.name)
-		self.D = Detector( 0.9, 1)
+		self.D = Detector( 0.84, 10)
 		self.D.train()
 			#cv2.setMouseCallback(self.name, self.mouse_handler4)
 	#self.writer = cv2.VideoWriter('alpha.avi',cv.CV_FOURCC('D','I','V','3'),10,size)
@@ -75,7 +75,7 @@ class InteractiveTrackingApp:
 			draw_region(annotated_img, corners, (255,0,0), 1)
 			self.fname.write('%-15s%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f%-8.2f\n'%('frame'+('%05d'%(self.times))+'.jpg',corners[0,0],corners[1,0],corners[0,1],corners[1,1],corners[0,2],corners[1,2],corners[0,3],corners[1,3]))
 		
-		#cv2.imwrite('../{0:04d}.jpg'.format(self.times),annotated_img) # Uncomment to save the images
+		cv2.imwrite('../{0:04d}.jpg'.format(self.times),annotated_img) # Uncomment to save the images
 		temp = original_img[corners[1][1]:corners[1][2], corners[0][0]:corners[0][1]]
 		cv2.imshow(self.name, annotated_img) # Comment to stop display
 		cv.WaitKey(500)

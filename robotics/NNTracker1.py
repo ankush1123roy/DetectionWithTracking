@@ -24,7 +24,7 @@ import math
 
 class NNTracker(TrackerBase):
 
-	def __init__(self, n_samples, n_iterations=10, res=(40,40), warp_generator=lambda:random_homography(0.02, 0.02), use_scv=True):
+	def __init__(self, n_samples, n_iterations=10, res=(40,40), warp_generator=lambda:random_homography(0.06, 0.06), use_scv=True):
 		""" An implemetation of the Nearest Neighbour Tracker. 
 	
 				Parameters:
