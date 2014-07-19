@@ -15,12 +15,16 @@ from SCVUtils import *
 from TrackerBase import *
 from SiftDetection import *
 from numpy.linalg import inv
+from build_graph import *
+from search_graph import *
+from knnsearch import *
 
 import cv2
 import pdb
 import sys
 import random
 import math
+from numpy import matrix as MA
 
 class NNTracker(TrackerBase):
 
@@ -97,7 +101,7 @@ class NNTracker(TrackerBase):
 		self.proposal /= self.proposal[2,2]
 		H =  self.warp_index.best_match(sampled_img)
 		SSD = (sum([abs(sampled_img[k] - self.template[k]) for k in range(self.template.shape[0])])/self.template.shape[0])
-		if SSD > 20:
+		if SSD > 30:
 			W = False
 		if self.use_scv: self.intensity_map = scv_intensity_map(sample_region(img, self.pts, self.get_warp()), self.template)
 		return self.proposal, W
@@ -126,8 +130,13 @@ class _WarpIndex:
 			self.images[:,i] = sample_and_normalize(img, pts, initial_warp * w.I)
 		print "Building FLANN Index..."
 		if self.sift == False:
+				print 'Building GNN not Flann'
+				self.images = MA(self.images,'f8')
+				self.nodes = build_graph(self.images.T,40)
+				'''
 				self.flann = pyflann.FLANN()
 				self.flann.build_index(self.images.T, algorithm='kdtree', trees=10)
+				'''
 		else:
 			desc = self.list2array(self.pixel2sift(self.images))
 			self.flann = pyflann.FLANN()
@@ -136,5 +145,9 @@ class _WarpIndex:
 
 
 	def best_match(self, img):
+		nn_id,b,c = search_graph(img,self.nodes,self.images.T,1)
+		return self.warps[int(nn_id)]
+		'''
 		results, dists = self.flann.nn_index(img)
 		return self.warps[results[0]]
+		'''

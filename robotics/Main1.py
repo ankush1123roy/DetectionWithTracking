@@ -27,7 +27,7 @@ class StandaloneTrackingApp(InteractiveTrackingApp):
 	def run(self):
 
 		i = 1
-		capture = cv2.VideoCapture('robot1.avi')
+		capture = cv2.VideoCapture('bookIIIM.avi')
 		#camera =  cv2.VideoCapture(0)
 		while i <= self.nframe:
 			flag, frame = capture.read()
@@ -40,9 +40,9 @@ class StandaloneTrackingApp(InteractiveTrackingApp):
 		self.cleanup()
 
 if __name__ == '__main__':
-	coarse_tracker = NNTracker(20000, 2, res=(40,40), use_scv=True)
-	#fine_tracker = ESMTracker(5, res=(40,40), use_scv=True)
-	fine_tracker = BakerMatthewsICTracker(40, res = (40,40), use_scv = True)
+	coarse_tracker = NNTracker(1000, 2, res=(40,40), use_scv=True)
+	fine_tracker = ESMTracker(5, res=(40,40), use_scv=True)
+	#fine_tracker = BakerMatthewsICTracker(40, res = (40,40), use_scv = True)
 	tracker = CascadeTracker([coarse_tracker, fine_tracker])
 	filename = '/home/ankush/OriginalNN/NNTracker/src/NNTracker/'
 	tracker_name = 'DeerCVPR'

@@ -28,7 +28,6 @@ class Detector():
 	
 	def train(self):
 		img1 = cv2.imread('../../Template1/' + '0001' + '.jpg',0) # queryImage
-		
 		self.height, self.width = img1.shape 
 		for i in range(1,3):
 			seq = '%04d'%i
@@ -49,7 +48,7 @@ class Detector():
 		kp1, des1 = self.Feature_Extractor.getFeatures(img)
 		FLANN_INDEX_KDTREE = 0
 		index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 10)
-		search_params = dict(checks = 20)
+		search_params = dict(checks = 50)
 		flann = cv2.FlannBasedMatcher(index_params, search_params)
 		matches = flann.knnMatch(des1, self.samples, k=2)
 		good = []
@@ -66,7 +65,7 @@ class Detector():
 				tmp.append([dst_pts[j][0][0],dst_pts[j][0][1]])
 			tmp = np.array(tmp)
 			#import pdb;pdb.set_trace()
-			centroids,_ = kmeans(tmp,4)
+			centroids,_ = kmeans(tmp,3)
 			idx,_ = vq(tmp,centroids)
 			major = {}
 			for l in idx:
@@ -98,10 +97,20 @@ class Detector():
 			cv2.imwrite('{0:04d}.jpg'.format(self.Number), img1)
 			self.Number = self.Number + 1
 			CO_ORDS = [[dst[0][0][0], dst[0][0][1]],[dst[3][0][0], dst[3][0][1]],[dst[2][0][0], dst[2][0][1]],[dst[1][0][0], dst[1][0][1]]]
+			'''
+			#temp = img[CO_ORDS[0][1]:CO_ORDS[2][1], CO_ORDS[0][0]:CO_ORDS[1][0]]
+			temp = img[CO_ORDS[2][1]:CO_ORDS[0][1], CO_ORDS[1][0]:CO_ORDS[0][0]]
+			cv2.imwrite('hjk.jpg', temp)
+			import pdb;pdb.set_trace()
+			kp, descriptors = self.Feature_Extractor.getFeatures(temp)
+			self.samples = np.vstack((self.samples,descriptors))
+			self.keypoints = self.keypoints + kp
+			'''
 			
 			if CO_ORDS[0][1] < CO_ORDS[2][1] and CO_ORDS[0][1] >= 0 and CO_ORDS[2][1] >=0:
 				if CO_ORDS[0][0] < CO_ORDS[1][0] and CO_ORDS[0][0] >= 0 and CO_ORDS[1][0] >= 0:
 					temp = img[CO_ORDS[0][1]:CO_ORDS[2][1], CO_ORDS[0][0]:CO_ORDS[1][0]]
+					cv2.imwrite('hjk.jpg', temp)
 					#import pdb;pdb.set_trace()
 					kp, descriptors = self.Feature_Extractor.getFeatures(temp)
 					self.samples = np.vstack((self.samples,descriptors))

@@ -57,7 +57,7 @@ class InteractiveTrackingApp:
 		self.fname = open(filename+'/'+tracker_name+'.txt','w')
 		self.fname.write('%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s%-8s\n'%('frame','ulx','uly','urx','ury','lrx','lry','llx','lly'))
 		cv2.namedWindow(self.name)
-		self.D = Detector( 0.84, 10)
+		self.D = Detector(0.84, 10)
 		self.D.train()
 			#cv2.setMouseCallback(self.name, self.mouse_handler4)
 	#self.writer = cv2.VideoWriter('alpha.avi',cv.CV_FOURCC('D','I','V','3'),10,size)
