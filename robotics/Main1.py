@@ -19,19 +19,22 @@ import cv
 class StandaloneTrackingApp(InteractiveTrackingApp):
 	""" A demo program that uses OpenCV to grab frames. """
 
-	def __init__(self, vc, tracker, filename, tracker_name, nframe,name = 'vis'):
+	def __init__(self, path, vc, tracker, filename, tracker_name, nframe,name = 'vis'):
 		InteractiveTrackingApp.__init__(self, tracker, filename, tracker_name,name)
 		self.vc = vc
 		self.nframe = nframe
+		self.path = path
 
 	def run(self):
 
 		i = 1
 		capture = cv2.VideoCapture('bookIIIM.avi')
 		#camera =  cv2.VideoCapture(0)
+		
 		while i <= self.nframe:
 			flag, frame = capture.read()
 			#f, frame = camera.read()
+			#frame = cv2.imread(self.path+'%010d.ppm'%i)
 			if frame == None: 
 				print('error loading image')
 				break
@@ -47,6 +50,6 @@ if __name__ == '__main__':
 	filename = '/home/ankush/OriginalNN/NNTracker/src/NNTracker/'
 	tracker_name = 'DeerCVPR'
 	nframe = 4000
-	app = StandaloneTrackingApp(None, coarse_tracker,filename,tracker_name,nframe)
+	app = StandaloneTrackingApp(path, None, coarse_tracker,filename,tracker_name,nframe)
 	app.run()
 	app.cleanup()
